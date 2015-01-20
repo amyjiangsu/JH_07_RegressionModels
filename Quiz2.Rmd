@@ -18,6 +18,12 @@ Give a P-value for the two sided hypothesis test of whether β1 from a linear re
     0.025
     0.391
 
+```{r}
+x <- c(0.61, 0.93, 0.83, 0.35, 0.54, 0.16, 0.91, 0.62, 0.62)
+y <- c(0.67, 0.84, 0.6, 0.18, 0.85, 0.47, 1.1, 0.65, 0.36)
+summary(lm(y~x))
+```
+
 ### Question 2
 
 Consider the previous problem, give the estimate of the residual standard deviation.
@@ -26,6 +32,10 @@ Consider the previous problem, give the estimate of the residual standard deviat
     0.223
     0.3552
     0.4358
+
+```{r}
+summary(lm(y~x))
+```
 
 ### Question 3
 
@@ -36,6 +46,14 @@ In the mtcars data set, fit a linear regression model of weight (predictor) on m
     -6.486
     21.190
 
+```{r}
+x<-mtcars$wt
+y<-mtcars$mpg
+fit<-lm(y ~ x)
+
+predict(fit, data.frame(x=mean(x)), interval = "confidence")
+```
+
 ### Question 4
 
 Refer to the previous question. Read the help file for mtcars. What is the weight coefficient interpreted as?
@@ -44,6 +62,10 @@ Refer to the previous question. Read the help file for mtcars. What is the weigh
     The estimated expected change in mpg per 1,000 lb increase in weight.
     The estimated 1,000 lb change in weight per 1 mpg increase.
     The estimated expected change in mpg per 1 lb increase in weight.
+
+```
+Answer: The estimated expected change in mpg per 1,000 lb increase in weight.
+```
 
 ### Question 5
 
@@ -54,6 +76,13 @@ Consider again the mtcars data set and a linear regression model with mpg as pre
     27.57
     14.93
 
+```{r}
+x <- mtcars$wt
+y <- mtcars$mpg
+fit <- lm(y ~ x)
+predict(fit, data.frame(x=3), interval="prediction")
+```
+
 ### Question 6
 
 Consider again the mtcars data set and a linear regression model with mpg as predicted by weight (in 1,000 lbs). A “short” ton is defined as 2,000 lbs. Construct a 95% confidence interval for the expected change in mpg per 1 short ton increase in weight. Give the lower endpoint.
@@ -62,6 +91,16 @@ Consider again the mtcars data set and a linear regression model with mpg as pre
     4.2026
     -9.000
     -12.973
+
+```{r}
+fit2 <- lm(y ~ I(x / 2))
+tbl2 <- summary(fit2)$coefficients
+mean <- tbl2[2,1]
+se <- tbl2[2,2]
+df <- fit2$df
+#Two sides T-Tests
+mean + c(-1,1) * qt(0.975, df=df) * se
+```
 
 ### Question 7
 
@@ -72,6 +111,10 @@ If my X from a linear regression is measured in centimeters and I convert it to 
     It would get divided by 100
     It would get multiplied by 100.
 
+```
+Answer: It would get multiplied by 100.
+```
+
 ### Question 8
 
 I have an outcome, Y, and a predictor, X and fit a linear regression model with Y=β0+β1X+ϵ to obtain β^0 and β^1. What would be the consequence to the subsequent slope and intercept if I were to refit the model with a new regressor, X+c for some constant, c?
@@ -81,6 +124,10 @@ I have an outcome, Y, and a predictor, X and fit a linear regression model with 
     The new intercept would be β^0+cβ^1
     The new intercept would be β^0−cβ^1
 
+```
+Answer: The new intercept would be β^0−cβ^1 
+```
+
 ### Question 9
 
 Refer back to the mtcars data set with mpg as an outcome and weight (wt) as the predictor. About what is the ratio of the the sum of the squared errors, ∑ni=1(Yi−Y^i)2 when comparing a model with just an intercept (denominator) to the model with the intercept and slope (numerator)?
@@ -89,6 +136,11 @@ Refer back to the mtcars data set with mpg as an outcome and weight (wt) as the 
     0.75
     0.50
     4.00
+    
+```{r}
+fit5<-lm(y ~ 1)
+anova(fit)$`Sum Sq`[2] / anova(fit5)$`Sum Sq`[1]
+```
 
 ### Question 10
 
@@ -98,3 +150,7 @@ Do the residuals always have to sum to 0 in linear regression?
     If an intercept is included, then they will sum to 0.
     The residuals never sum to zero.
     The residuals must always sum to zero.
+
+```
+Answer: If an intercept is included, then they will sum to 0.
+```

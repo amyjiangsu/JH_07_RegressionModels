@@ -14,6 +14,16 @@ Consider the space shuttle data ?shuttle in the MASS library. Consider modeling 
     0.969
     -0.031
 
+```{r}
+library(MASS)
+levels(shuttle$use)[1] <- "1"
+levels(shuttle$use)[2] <- "0"
+shuttle$use <- as.numeric(as.character(shuttle$use))
+fit <- glm(use~factor(wind)-1, family= binomial(), data=shuttle)
+summary(fit)$coef
+1/exp(0.03181)
+```
+
 ### Question 2
 
 Consider the previous problem. Give the estimated odds ratio for autolander use comparing head winds (numerator) to tail winds (denominator) adjusting for wind strength from the variable magn.
@@ -23,6 +33,12 @@ Consider the previous problem. Give the estimated odds ratio for autolander use 
     1.00
     1.485
 
+```{r}
+summary(logRegshuttle <- glm(use ~ wind,family="binomial", data=shuttle))
+glm(formula = use ~ factor(wind)+magn, family = binomial(logit), data = shuttle)
+1/exp(0.03201)
+```
+
 ### Question 3
 
 If you fit a logistic regression model to a binary variable, for example use of the autolander, then fit a logistic regression model for one minus the outcome (not using the autolander) what happens to the coefficients?
@@ -31,6 +47,13 @@ If you fit a logistic regression model to a binary variable, for example use of 
     The intercept changes sign, but the other coefficients don't.
     The coefficients reverse their signs.
     The coefficients change in a non-linear fashion.
+    
+```{r}
+fit<-glm(use ~ factor(wind), family = binomial, data = shuttle)
+summary(fit)$coef
+fit<-glm(1 - use ~ factor(wind), family = binomial, data = shuttle)
+summary(fit)$coef
+```
 
 ### Question 4
 
@@ -41,6 +64,11 @@ Consider the insect spray data InsectSprays. Fit a Poisson model using spray as 
     0.9457
     0.321
 
+```{r}
+exp(coef(glm(count ~ as.factor(spray) - 1, family="poisson", InsectSprays)))
+14.5/15.333
+```
+
 ### Question 5
 
 Consider a Poisson glm with an offset, t. So, for example, a model of the form glm(count ~ x + offset(t), family = poisson) where x is a factor variable comparing a treatment (1) to a control (0) and t is the natural log of a monitoring time. What is impact of the coefficient for x if we fit the model glm(count ~ x + offset(t2), family = poisson) where t2 <- log(10) + t? In other words, what happens to the coefficients if we change the units of the offset variable. (Note, adding log(10) on the log scale is multiplying by 10 on the original scale.)
@@ -49,6 +77,10 @@ Consider a Poisson glm with an offset, t. So, for example, a model of the form g
     The coefficient estimate is multiplied by 10.
     The coefficient estimate is unchanged
     The coefficient estimate is divided by 10.
+
+```
+Answer: The coefficient estimate is unchanged.
+```
 
 ### Question 6
 
@@ -63,3 +95,18 @@ Using a knot point at 0, fit a linear model that looks like a hockey stick with 
     1.013
     -0.183
     -1.024
+
+```{r}
+x <- -5:5
+y <- c(5.12, 3.93, 2.67, 1.87, 0.52, 0.08, 0.93, 2.05, 2.54, 3.87, 4.97)
+
+knots<-c(0)
+splineTerms<-sapply(knots,function(knot) (x>knot)*(x-knot))
+xmat<-cbind(1,x,splineTerms)
+fit<-lm(y~xmat-1)
+yhat<-predict(fit)
+
+summary(fit)$coef
+(yhat[11]-yhat[9])/2
+(yhat[11]-yhat[8])/3
+```

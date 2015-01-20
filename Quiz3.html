@@ -60,14 +60,48 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <div id="question-1" class="section level3">
 <h3>Question 1</h3>
 <p>Consider the mtcars data set. Fit a model with mpg as the outcome that includes number of cylinders as a factor variable and weight as confounder. Give the adjusted estimate for the expected change in mpg comparing 8 cylinders to 4.</p>
-<p>-4.256 -6.071 33.991 -3.206</p>
+<pre><code>-4.256
+-6.071
+33.991
+-3.206</code></pre>
+<pre class="r"><code>fit &lt;- lm(mpg ~ as.factor(cyl) + wt, mtcars)
+summary(fit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ as.factor(cyl) + wt, data = mtcars)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.5890 -1.2357 -0.5159  1.3845  5.7915 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)      33.9908     1.8878  18.006  &lt; 2e-16 ***
+## as.factor(cyl)6  -4.2556     1.3861  -3.070 0.004718 ** 
+## as.factor(cyl)8  -6.0709     1.6523  -3.674 0.000999 ***
+## wt               -3.2056     0.7539  -4.252 0.000213 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.557 on 28 degrees of freedom
+## Multiple R-squared:  0.8374, Adjusted R-squared:   0.82 
+## F-statistic: 48.08 on 3 and 28 DF,  p-value: 3.594e-11</code></pre>
 </div>
 <div id="question-2" class="section level3">
 <h3>Question 2</h3>
-<p>Consider the mtcars data set. Fit a model with mpg as the outcome that includes number of cylinders as a factor variable and weight as a possible confounding variable. Compare the effect of 8 versus 4 cylinders on mpg for the adjusted and unadjusted by weight models. Here, adjusted means including the weight variable as a term in the regression model and unadjusted means the model without weight included. What can be said about the effect comparing 8 and 4 cylinders after looking at models with and without weight included?. Within a given weight, 8 cylinder vehicles have an expected 12 mpg drop in fuel efficiency.</p>
-<pre><code>Including or excluding weight does not appear to change anything regarding the estimated impact of number of cylinders on mpg.
+<p>Consider the mtcars data set. Fit a model with mpg as the outcome that includes number of cylinders as a factor variable and weight as a possible confounding variable. Compare the effect of 8 versus 4 cylinders on mpg for the adjusted and unadjusted by weight models. Here, adjusted means including the weight variable as a term in the regression model and unadjusted means the model without weight included. What can be said about the effect comparing 8 and 4 cylinders after looking at models with and without weight included?.</p>
+<pre><code>Within a given weight, 8 cylinder vehicles have an expected 12 mpg drop in fuel efficiency.
+Including or excluding weight does not appear to change anything regarding the estimated impact of number of cylinders on mpg.
 Holding weight constant, cylinder appears to have more of an impact on mpg than if weight is disregarded.
 Holding weight constant, cylinder appears to have less of an impact on mpg than if weight is disregarded.</code></pre>
+<pre class="r"><code>fit1 &lt;- lm(mpg ~ factor(cyl), data = mtcars)
+fit2 &lt;- lm(mpg ~ factor(cyl) + wt, data = mtcars)
+fit1$coefficients</code></pre>
+<pre><code>##  (Intercept) factor(cyl)6 factor(cyl)8 
+##    26.663636    -6.920779   -11.563636</code></pre>
+<pre class="r"><code>fit2$coefficients</code></pre>
+<pre><code>##  (Intercept) factor(cyl)6 factor(cyl)8           wt 
+##    33.990794    -4.255582    -6.070860    -3.205613</code></pre>
 </div>
 <div id="question-3" class="section level3">
 <h3>Question 3</h3>
@@ -78,6 +112,12 @@ The P-value is larger than 0.05. So, according to our criterion, we would fail t
 The P-value is small (less than 0.05). Thus it is surely true that there is no interaction term in the true model.
 The P-value is larger than 0.05. So, according to our criterion, we would fail to reject, which suggests that the interaction terms is necessary.
 The P-value is small (less than 0.05). Thus it is surely true that there is an interaction term in the true model.</code></pre>
+<pre class="r"><code>data(mtcars)
+fit1 &lt;- lm(mpg ~ factor(cyl) + wt, data = mtcars)
+fit2 &lt;- lm(mpg ~ factor(cyl) + wt + interaction(cyl, wt), data = mtcars)
+compare &lt;- anova(fit1, fit2)
+compare$Pr</code></pre>
+<pre><code>## [1]         NA 0.08358536</code></pre>
 </div>
 <div id="question-4" class="section level3">
 <h3>Question 4</h3>
@@ -89,6 +129,14 @@ The estimated expected change in MPG per half ton increase in weight for the ave
 The estimated expected change in MPG per half ton increase in weight.
 The estimated expected change in MPG per one ton increase in weight for a specific number of cylinders (4, 6, 8).
 The estimated expected change in MPG per one ton increase in weight.</code></pre>
+<pre class="r"><code>lm(mpg ~ I(wt * 0.5) + factor(cyl), data = mtcars)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ I(wt * 0.5) + factor(cyl), data = mtcars)
+## 
+## Coefficients:
+##  (Intercept)   I(wt * 0.5)  factor(cyl)6  factor(cyl)8  
+##       33.991        -6.411        -4.256        -6.071</code></pre>
 </div>
 <div id="question-5" class="section level3">
 <h3>Question 5</h3>
@@ -99,6 +147,12 @@ The estimated expected change in MPG per one ton increase in weight.</code></pre
 0.2804
 0.2287
 0.9946</code></pre>
+<pre class="r"><code>x &lt;- c(0.586, 0.166, -0.042, -0.614, 11.72)
+y &lt;- c(0.549, -0.026, -0.127, -0.751, 1.344)
+fit &lt;- lm(y ~ x)
+lm.influence(fit)$hat</code></pre>
+<pre><code>##         1         2         3         4         5 
+## 0.2286650 0.2438146 0.2525027 0.2804443 0.9945734</code></pre>
 </div>
 <div id="question-6" class="section level3">
 <h3>Question 6</h3>
@@ -109,6 +163,19 @@ The estimated expected change in MPG per one ton increase in weight.</code></pre
 -.00134
 -134
 -0.378</code></pre>
+<pre class="r"><code>x &lt;- c(0.586, 0.166, -0.042, -0.614, 11.72)
+y &lt;- c(0.549, -0.026, -0.127, -0.751, 1.344)
+fit &lt;- lm(y~x)
+lm.influence(fit)$hat</code></pre>
+<pre><code>##         1         2         3         4         5 
+## 0.2286650 0.2438146 0.2525027 0.2804443 0.9945734</code></pre>
+<pre class="r"><code>dfbetas(fit)</code></pre>
+<pre><code>##   (Intercept)             x
+## 1  1.06212391   -0.37811633
+## 2  0.06748037   -0.02861769
+## 3 -0.01735756    0.00791512
+## 4 -1.24958248    0.67253246
+## 5  0.20432010 -133.82261293</code></pre>
 </div>
 <div id="question-7" class="section level3">
 <h3>Question 7</h3>
@@ -117,6 +184,7 @@ The estimated expected change in MPG per one ton increase in weight.</code></pre
 For the the coefficient to change sign, there must be a significant interaction term.
 It is possible for the coefficient to reverse sign after adjustment. For example, it can be strongly significant and positive before adjustment and strongly significant and negative after adjustment.
 The coefficient can't change sign after adjustment, except for slight numerical pathological cases.</code></pre>
+<pre><code>Answer: It is possible for the coefficient to reverse sign after adjustment. For example, it can be strongly significant and positive before adjustment and strongly significant and negative after adjustment.</code></pre>
 </div>
 
 

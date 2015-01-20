@@ -64,6 +64,17 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 1.327
 0.969
 -0.031</code></pre>
+<pre class="r"><code>library(MASS)
+levels(shuttle$use)[1] &lt;- &quot;1&quot;
+levels(shuttle$use)[2] &lt;- &quot;0&quot;
+shuttle$use &lt;- as.numeric(as.character(shuttle$use))
+fit &lt;- glm(use~factor(wind)-1, family= binomial(), data=shuttle)
+summary(fit)$coef</code></pre>
+<pre><code>##                   Estimate Std. Error  z value  Pr(&gt;|z|)
+## factor(wind)head 0.2513144  0.1781742 1.410499 0.1583925
+## factor(wind)tail 0.2831263  0.1785510 1.585689 0.1128099</code></pre>
+<pre class="r"><code>1/exp(0.03181)</code></pre>
+<pre><code>## [1] 0.9686906</code></pre>
 </div>
 <div id="question-2" class="section level3">
 <h3>Question 2</h3>
@@ -72,6 +83,43 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 0.684
 1.00
 1.485</code></pre>
+<pre class="r"><code>summary(logRegshuttle &lt;- glm(use ~ wind,family=&quot;binomial&quot;, data=shuttle))</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = use ~ wind, family = &quot;binomial&quot;, data = shuttle)
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+## -1.300  -1.286   1.060   1.073   1.073  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept)  0.25131    0.17817   1.410    0.158
+## windtail     0.03181    0.25224   0.126    0.900
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 350.36  on 255  degrees of freedom
+## Residual deviance: 350.35  on 254  degrees of freedom
+## AIC: 354.35
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<pre class="r"><code>glm(formula = use ~ factor(wind)+magn, family = binomial(logit), data = shuttle)</code></pre>
+<pre><code>## 
+## Call:  glm(formula = use ~ factor(wind) + magn, family = binomial(logit), 
+##     data = shuttle)
+## 
+## Coefficients:
+##      (Intercept)  factor(wind)tail        magnMedium           magnOut  
+##        3.635e-01         3.201e-02         1.205e-15        -3.795e-01  
+##       magnStrong  
+##       -6.441e-02  
+## 
+## Degrees of Freedom: 255 Total (i.e. Null);  251 Residual
+## Null Deviance:       350.4 
+## Residual Deviance: 348.8     AIC: 358.8</code></pre>
+<pre class="r"><code>1/exp(0.03201)</code></pre>
+<pre><code>## [1] 0.9684969</code></pre>
 </div>
 <div id="question-3" class="section level3">
 <h3>Question 3</h3>
@@ -80,6 +128,16 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 The intercept changes sign, but the other coefficients don't.
 The coefficients reverse their signs.
 The coefficients change in a non-linear fashion.</code></pre>
+<pre class="r"><code>fit&lt;-glm(use ~ factor(wind), family = binomial, data = shuttle)
+summary(fit)$coef</code></pre>
+<pre><code>##                    Estimate Std. Error   z value  Pr(&gt;|z|)
+## (Intercept)      0.25131443  0.1781742 1.4104987 0.1583925
+## factor(wind)tail 0.03181183  0.2522429 0.1261159 0.8996402</code></pre>
+<pre class="r"><code>fit&lt;-glm(1 - use ~ factor(wind), family = binomial, data = shuttle)
+summary(fit)$coef</code></pre>
+<pre><code>##                     Estimate Std. Error    z value  Pr(&gt;|z|)
+## (Intercept)      -0.25131443  0.1781742 -1.4104987 0.1583925
+## factor(wind)tail -0.03181183  0.2522429 -0.1261159 0.8996402</code></pre>
 </div>
 <div id="question-4" class="section level3">
 <h3>Question 4</h3>
@@ -88,6 +146,13 @@ The coefficients change in a non-linear fashion.</code></pre>
 -0.056
 0.9457
 0.321</code></pre>
+<pre class="r"><code>exp(coef(glm(count ~ as.factor(spray) - 1, family=&quot;poisson&quot;, InsectSprays)))</code></pre>
+<pre><code>## as.factor(spray)A as.factor(spray)B as.factor(spray)C as.factor(spray)D 
+##         14.500000         15.333333          2.083333          4.916667 
+## as.factor(spray)E as.factor(spray)F 
+##          3.500000         16.666667</code></pre>
+<pre class="r"><code>14.5/15.333</code></pre>
+<pre><code>## [1] 0.9456727</code></pre>
 </div>
 <div id="question-5" class="section level3">
 <h3>Question 5</h3>
@@ -96,6 +161,7 @@ The coefficients change in a non-linear fashion.</code></pre>
 The coefficient estimate is multiplied by 10.
 The coefficient estimate is unchanged
 The coefficient estimate is divided by 10.</code></pre>
+<pre><code>Answer: The coefficient estimate is unchanged.</code></pre>
 </div>
 <div id="question-6" class="section level3">
 <h3>Question 6</h3>
@@ -106,6 +172,26 @@ The coefficient estimate is divided by 10.</code></pre>
 1.013
 -0.183
 -1.024</code></pre>
+<pre class="r"><code>x &lt;- -5:5
+y &lt;- c(5.12, 3.93, 2.67, 1.87, 0.52, 0.08, 0.93, 2.05, 2.54, 3.87, 4.97)
+
+knots&lt;-c(0)
+splineTerms&lt;-sapply(knots,function(knot) (x&gt;knot)*(x-knot))
+xmat&lt;-cbind(1,x,splineTerms)
+fit&lt;-lm(y~xmat-1)
+yhat&lt;-predict(fit)
+
+summary(fit)$coef</code></pre>
+<pre><code>##         Estimate Std. Error    t value     Pr(&gt;|t|)
+## xmat  -0.1825806 0.13557812  -1.346682 2.149877e-01
+## xmatx -1.0241584 0.04805280 -21.313188 2.470198e-08
+## xmat   2.0372258 0.08574713  23.758531 1.048711e-08</code></pre>
+<pre class="r"><code>(yhat[11]-yhat[9])/2</code></pre>
+<pre><code>##       11 
+## 1.013067</code></pre>
+<pre class="r"><code>(yhat[11]-yhat[8])/3</code></pre>
+<pre><code>##       11 
+## 1.013067</code></pre>
 </div>
 
 
